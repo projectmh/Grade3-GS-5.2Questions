@@ -1,0 +1,1223 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>居住好環境 - 超級防衛隊特訓測驗</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700;900&family=Rajdhani:wght@600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        cyber: {
+                            bg: '#0a0e17',
+                            panel: '#121826',
+                            border: '#1f293d',
+                            accent: '#00f0ff',
+                            neon: '#39ff14',
+                            warning: '#ff2a6d',
+                            gold: '#ffd700'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Noto Sans TC', 'sans-serif'],
+                        tech: ['Rajdhani', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #0a0e17;
+            background-image: 
+                radial-gradient(circle at 50% 0%, rgba(0, 240, 255, 0.08) 0%, transparent 60%),
+                linear-gradient(to bottom, rgba(10, 14, 23, 0.95), rgba(10, 14, 23, 0.98)),
+                repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 240, 255, 0.02) 2px, rgba(0, 240, 255, 0.02) 4px);
+            color: #e2e8f0;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .neon-border {
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.2), inset 0 0 15px rgba(0, 240, 255, 0.1);
+            border: 1px solid rgba(0, 240, 255, 0.3);
+        }
+
+        .cyber-btn {
+            position: relative;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
+        }
+
+        .cyber-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.4);
+        }
+
+        .cyber-card {
+            background: rgba(18, 24, 38, 0.9);
+            backdrop-filter: blur(12px);
+            clip-path: polygon(16px 0, 100% 0, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0 100%, 0 16px);
+        }
+
+        /* Large Accessible Touch Targets for Fill-in-Blank & Options */
+        .big-choice-btn {
+            font-size: 1.25rem; /* 20px */
+            line-height: 1.75rem;
+            padding: 1rem 1.25rem;
+            min-height: 3.8rem;
+            border-width: 2px;
+        }
+
+        @media (min-width: 640px) {
+            .big-choice-btn {
+                font-size: 1.5rem; /* 24px */
+                padding: 1.25rem 1.75rem;
+                min-height: 4.5rem;
+            }
+        }
+
+        .speak-btn {
+            transition: all 0.15s ease;
+        }
+        .speak-btn:hover {
+            transform: scale(1.1);
+            color: #00f0ff;
+        }
+        .speaking-active {
+            animation: pulse-ring 1s infinite;
+            color: #39ff14 !important;
+        }
+
+        @keyframes pulse-ring {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0a0e17; }
+        ::-webkit-scrollbar-thumb { background: #00f0ff; border-radius: 3px; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between font-sans antialiased text-slate-200">
+
+    <!-- Top Dashboard Header -->
+    <header class="bg-cyber-panel/90 border-b border-cyber-border sticky top-0 z-50 backdrop-blur-md">
+        <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
+            <!-- Brand -->
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="goHome()">
+                <div class="w-10 h-10 rounded-lg bg-cyan-500/10 border border-cyber-accent flex items-center justify-center text-cyber-accent text-xl shadow-[0_0_12px_rgba(0,240,255,0.3)]">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+                <div>
+                    <h1 class="font-extrabold text-lg md:text-xl tracking-wider text-white flex items-center gap-2">
+                        居住好環境 <span class="text-xs px-2 py-0.5 rounded bg-cyan-950 text-cyber-accent border border-cyber-accent font-tech">V4.0 AUDIO</span>
+                    </h1>
+                    <p class="text-xs text-slate-400">三年級常識科第2課 特訓基地</p>
+                </div>
+            </div>
+
+            <!-- Dashboard Stats & TTS Toggle -->
+            <div class="flex items-center space-x-3 md:space-x-4">
+                <!-- Auto-Speech Toggle -->
+                <button id="auto-tts-btn" onclick="toggleAutoTTS()" title="自動朗讀題目" class="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-slate-900 border border-slate-700 text-xs text-slate-300 hover:border-cyber-accent">
+                    <i id="auto-tts-icon" class="fa-solid fa-robot text-cyber-accent"></i>
+                    <span class="hidden sm:inline">自動語音:</span>
+                    <span id="auto-tts-status" class="font-bold text-cyber-neon">開啟</span>
+                </button>
+
+                <!-- High Score -->
+                <div class="flex items-center space-x-2 bg-slate-900/90 px-3 py-1.5 rounded-md border border-slate-700">
+                    <i class="fa-solid fa-trophy text-cyber-gold text-sm"></i>
+                    <span class="text-xs text-slate-400 hidden sm:inline">最高:</span>
+                    <span id="high-score" class="font-tech text-cyber-gold font-bold text-base">0</span>
+                </div>
+
+                <!-- Sound Toggle -->
+                <button id="sound-btn" onclick="toggleSound()" class="w-9 h-9 rounded-md bg-slate-800 border border-slate-600 hover:border-cyber-accent flex items-center justify-center text-slate-300 hover:text-cyber-accent transition">
+                    <i id="sound-icon" class="fa-solid fa-volume-high"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-4xl mx-auto px-4 py-6 w-full flex-grow flex flex-col justify-center">
+
+        <!-- 1. START / MODE SELECTION SCREEN -->
+        <div id="start-screen" class="cyber-card p-6 md:p-10 border border-cyber-border neon-border text-center my-auto">
+            <div class="inline-block p-4 rounded-full bg-cyan-950/60 border border-cyber-accent/40 mb-3">
+                <i class="fa-solid fa-gamepad text-5xl text-cyber-accent"></i>
+            </div>
+            <h2 class="text-2xl md:text-3xl font-black text-white mb-2 tracking-wide">選擇你的遊戲模式</h2>
+            <p class="text-slate-300 max-w-lg mx-auto mb-6 text-sm md:text-base">
+                設有全新語音朗讀功能！點擊喇叭即可聽讀題目和選項，幫助不認字的同學輕鬆溫習！
+            </p>
+
+            <!-- Mode Selection Cards Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto mb-8 text-left">
+                <!-- Mode 1: MC -->
+                <div onclick="selectGameMode('MC')" class="mode-card cursor-pointer bg-slate-900/90 hover:bg-slate-800 p-5 rounded-xl border border-slate-700 hover:border-cyber-accent transition group flex items-center space-x-4">
+                    <div class="w-12 h-12 rounded-lg bg-blue-500/20 text-blue-400 border border-blue-500/40 flex items-center justify-center text-2xl group-hover:scale-110 transition">
+                        <i class="fa-solid fa-list-check"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-white text-lg group-hover:text-cyber-accent">多項選擇題</h3>
+                        <p class="text-xs text-slate-400">從四個選項中選出唯一正確答案</p>
+                    </div>
+                </div>
+
+                <!-- Mode 2: Fill in the Blank -->
+                <div onclick="selectGameMode('FITB')" class="mode-card cursor-pointer bg-slate-900/90 hover:bg-slate-800 p-5 rounded-xl border border-slate-700 hover:border-cyber-accent transition group flex items-center space-x-4">
+                    <div class="w-12 h-12 rounded-lg bg-purple-500/20 text-purple-400 border border-purple-500/40 flex items-center justify-center text-2xl group-hover:scale-110 transition">
+                        <i class="fa-solid fa-font"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-white text-lg group-hover:text-cyber-accent">選詞填空題</h3>
+                        <p class="text-xs text-slate-400">超大按鈕！點擊詞語完成句子</p>
+                    </div>
+                </div>
+
+                <!-- Mode 3: True or False -->
+                <div onclick="selectGameMode('TF')" class="mode-card cursor-pointer bg-slate-900/90 hover:bg-slate-800 p-5 rounded-xl border border-slate-700 hover:border-cyber-accent transition group flex items-center space-x-4">
+                    <div class="w-12 h-12 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 flex items-center justify-center text-2xl group-hover:scale-110 transition">
+                        <i class="fa-solid fa-check-double"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-white text-lg group-hover:text-cyber-accent">是非判斷題</h3>
+                        <p class="text-xs text-slate-400">快速判斷句子是「正確」還是「錯誤」</p>
+                    </div>
+                </div>
+
+                <!-- Mode 4: Mixed Challenge -->
+                <div onclick="selectGameMode('MIXED')" class="mode-card cursor-pointer bg-slate-900/90 hover:bg-slate-800 p-5 rounded-xl border border-slate-700 hover:border-cyber-gold transition group flex items-center space-x-4">
+                    <div class="w-12 h-12 rounded-lg bg-amber-500/20 text-cyber-gold border border-amber-500/40 flex items-center justify-center text-2xl group-hover:scale-110 transition">
+                        <i class="fa-solid fa-bolt"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-cyber-gold text-lg">綜合大挑戰</h3>
+                        <p class="text-xs text-slate-400">混合所有題型，極限訓練！</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Start All Button -->
+            <button onclick="selectGameMode('MIXED')" class="cyber-btn w-full sm:w-auto px-10 py-4 bg-cyber-accent hover:bg-cyan-300 text-slate-950 font-black text-lg flex items-center justify-center gap-2 mx-auto">
+                <i class="fa-solid fa-play"></i> 開始綜合特訓 (10題)
+            </button>
+        </div>
+
+        <!-- 2. ACTIVE QUIZ GAME SCREEN -->
+        <div id="quiz-screen" class="hidden flex-col gap-5">
+
+            <!-- Progress Header -->
+            <div class="cyber-card p-4 border border-cyber-border flex flex-col md:flex-row items-center justify-between gap-4">
+                <div class="w-full md:w-auto flex items-center justify-between md:justify-start space-x-4">
+                    <span id="mode-badge" class="px-3 py-1 rounded text-xs font-bold uppercase tracking-wider bg-blue-950 text-cyber-accent border border-cyber-accent/40">
+                        MODE
+                    </span>
+                    <span class="text-xs text-slate-400 font-tech">
+                        第 <span id="current-index" class="text-cyber-accent text-lg font-bold">1</span> / <span id="total-questions">10</span> 題
+                    </span>
+                </div>
+
+                <!-- Progress Bar -->
+                <div class="w-full md:w-1/2 flex items-center space-x-3">
+                    <i class="fa-solid fa-fire-flame-curved text-amber-500 text-sm"></i>
+                    <div class="w-full bg-slate-900 rounded-full h-3 overflow-hidden border border-slate-700">
+                        <div id="progress-bar" class="bg-gradient-to-r from-cyan-500 to-cyber-neon h-full w-0 transition-all duration-300"></div>
+                    </div>
+                    <span id="score-text" class="font-tech text-cyber-gold font-bold text-lg min-w-[60px] text-right">0 PTS</span>
+                </div>
+            </div>
+
+            <!-- Question Card -->
+            <div class="cyber-card p-6 md:p-8 border border-cyber-border neon-border relative overflow-hidden">
+                <!-- Question Header with Audio Button -->
+                <div class="flex items-start justify-between gap-3 mb-4">
+                    <div id="question-category" class="text-xs font-bold text-cyber-accent tracking-widest uppercase flex items-center gap-2">
+                        <i class="fa-solid fa-circle-dot text-[10px]"></i> 題目
+                    </div>
+                    <!-- Question Speaker Button -->
+                    <button id="speak-question-btn" onclick="speakCurrentQuestion()" class="speak-btn px-3 py-1.5 rounded-lg bg-cyan-950 border border-cyber-accent text-cyber-accent text-sm font-bold flex items-center gap-2 shadow-[0_0_10px_rgba(0,240,255,0.2)]">
+                        <i class="fa-solid fa-volume-high"></i> 讀題目
+                    </button>
+                </div>
+
+                <!-- Question Text -->
+                <h3 id="question-text" class="text-xl md:text-2xl font-bold text-white mb-6 leading-relaxed">
+                    載入題目中...
+                </h3>
+
+                <!-- Dynamic Answer Options Container -->
+                <div id="answer-container" class="space-y-4">
+                    <!-- Dynamically generated buttons with individual speaker icons -->
+                </div>
+
+                <!-- Word Bank Container (For Fill In Blank) -->
+                <div id="word-bank-container" class="hidden mt-6 pt-5 border-t border-slate-800">
+                    <div class="text-sm font-bold text-cyber-accent mb-3 flex items-center justify-between">
+                        <span class="flex items-center gap-2"><i class="fa-solid fa-box-archive"></i> 點擊下方詞語填入空格：</span>
+                    </div>
+                    <!-- BIGGER & ACCESSIBLE CHOICE CHIPS -->
+                    <div id="word-bank-words" class="flex flex-wrap gap-3">
+                        <!-- Big choices injected here -->
+                    </div>
+                </div>
+
+                <!-- Instant Feedback Banner -->
+                <div id="feedback-box" class="hidden mt-6 p-4 rounded-xl border transition-all duration-300">
+                    <div class="flex items-start space-x-3">
+                        <div id="feedback-icon" class="text-2xl mt-0.5"></div>
+                        <div class="flex-grow">
+                            <h4 id="feedback-title" class="font-bold text-base mb-1"></h4>
+                            <p id="feedback-detail" class="text-xs md:text-sm text-slate-300 leading-relaxed"></p>
+                        </div>
+                        <button onclick="speakText(document.getElementById('feedback-detail').innerText)" class="speak-btn text-slate-400 hover:text-white p-1">
+                            <i class="fa-solid fa-volume-high"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Submit / Next Actions -->
+                <div class="mt-8 flex justify-end">
+                    <button id="submit-btn" onclick="checkAnswer()" class="cyber-btn px-8 py-3.5 bg-cyber-accent hover:bg-cyan-300 text-slate-950 font-black text-lg flex items-center gap-2">
+                        確認答案 <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                    <button id="next-btn" onclick="nextQuestion()" class="cyber-btn hidden px-8 py-3.5 bg-cyber-neon hover:bg-green-400 text-slate-950 font-black text-lg flex items-center gap-2">
+                        下一題 <i class="fa-solid fa-forward"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. RESULTS SCREEN - SHOWS ONLY WRONG QUESTIONS -->
+        <div id="result-screen" class="hidden cyber-card p-6 md:p-10 border border-cyber-border neon-border text-center my-auto">
+            
+            <div id="perfect-badge-container" class="hidden">
+                <i class="fa-solid fa-award text-7xl text-cyber-gold animate-bounce mb-3"></i>
+                <h2 class="text-3xl font-black text-white mb-2">太棒了！100% 全對滿分！</h2>
+                <p class="text-cyber-neon font-bold text-lg mb-6">你已經完全掌握《居住好環境》的所有知識點！</p>
+            </div>
+
+            <div id="mistake-badge-container" class="hidden">
+                <i class="fa-solid fa-shield-cat text-6xl text-cyber-accent mb-3"></i>
+                <h2 class="text-2xl md:text-3xl font-black text-white mb-2">特訓完成！錯題檢討</h2>
+                <p class="text-slate-300 text-sm mb-6">重點溫習以下答錯的題目，下次挑戰爭取滿分！</p>
+            </div>
+
+            <!-- Score Cards Grid -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-2xl mx-auto mb-8">
+                <div class="bg-slate-900/90 p-4 rounded-xl border border-slate-800">
+                    <p class="text-xs text-slate-400 mb-1">總得分</p>
+                    <p id="final-score" class="font-tech text-2xl font-bold text-cyber-gold">0</p>
+                </div>
+                <div class="bg-slate-900/90 p-4 rounded-xl border border-slate-800">
+                    <p class="text-xs text-slate-400 mb-1">正確率</p>
+                    <p id="final-accuracy" class="font-tech text-2xl font-bold text-cyber-accent">0%</p>
+                </div>
+                <div class="bg-slate-900/90 p-4 rounded-xl border border-slate-800">
+                    <p class="text-xs text-slate-400 mb-1">最高連勝</p>
+                    <p id="final-streak" class="font-tech text-2xl font-bold text-amber-400">0</p>
+                </div>
+                <div class="bg-slate-900/90 p-4 rounded-xl border border-slate-800">
+                    <p class="text-xs text-slate-400 mb-1">答對題數</p>
+                    <p id="final-correct" class="font-tech text-2xl font-bold text-cyber-neon">0/0</p>
+                </div>
+            </div>
+
+            <!-- ONLY SHOW WRONG QUESTIONS CONTAINER -->
+            <div id="wrong-questions-section" class="text-left max-w-2xl mx-auto mb-8 hidden">
+                <h4 class="text-sm font-bold text-red-400 mb-3 flex items-center gap-2">
+                    <i class="fa-solid fa-triangle-exclamation"></i> 本次答錯的題目（收聽朗讀溫習）：
+                </h4>
+                <div id="wrong-questions-list" class="space-y-4 max-h-80 overflow-y-auto pr-2">
+                    <!-- Only wrong questions populated here -->
+                </div>
+            </div>
+
+            <!-- Action Controls -->
+            <div class="flex flex-col sm:flex-row justify-center items-center gap-4">
+                <button onclick="goHome()" class="cyber-btn w-full sm:w-auto px-8 py-3.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold border border-slate-600 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-house"></i> 返回模式選單
+                </button>
+                <button onclick="restartQuiz()" class="cyber-btn w-full sm:w-auto px-8 py-3.5 bg-cyber-accent hover:bg-cyan-300 text-slate-950 font-black text-lg flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-rotate-right"></i> 再挑戰一次
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-cyber-panel/60 border-t border-cyber-border/50 py-3 text-center text-xs text-slate-500">
+        <p>《居住好環境》廣東話/中文語音特訓系統 &copy; 完整包含課本全部知識點</p>
+    </footer>
+
+    <!-- LOGIC & HUGE QUESTION DATABASE -->
+    <script>
+        /* ====================================================
+           1. HUGE COMPREHENSIVE QUESTION BANK (NO REPEATS)
+           Strictly derived from Note Sections 1 to 5
+        ==================================================== */
+        const MASTER_QUESTION_BANK = [
+            // ----------------- MC QUESTIONS -----------------
+            {
+                id: 'MC_1',
+                type: 'MC',
+                category: '社區衛生 - 冷氣滴水',
+                question: '冷氣機滴水和冷氣機托盤積水，最容易引致以下哪種社區問題？',
+                options: ['滋生蚊蟲', '老鼠咬碎財物', '產生交通噪音', '阻隔灰塵'],
+                answer: 0,
+                explanation: '根據筆記：冷氣機托盤積水等有積水的地方容易滋生蚊子。'
+            },
+            {
+                id: 'MC_2',
+                type: 'MC',
+                category: '社區衛生 - 後巷環境',
+                question: '如果後巷滿是積水和垃圾，會招致什麼害蟲害獸？',
+                options: ['滋生蚊蟲和吸引老鼠', '吸引發光螢火蟲', '引來大量野生鳥類', '引起沙塵暴'],
+                answer: 0,
+                explanation: '根據筆記：後巷滿是積水和垃圾會滋生蚊蟲並吸引老鼠出沒。'
+            },
+            {
+                id: 'MC_3',
+                type: 'MC',
+                category: '社區衛生 - 污水處理',
+                question: '餐廳職員把污水倒進馬路邊的排水渠，這種行為屬於什麼？',
+                options: ['常見的社區衛生問題', '政府鼓勵的清潔做法', '綠化社區活動', '減少噪音措施'],
+                answer: 0,
+                explanation: '根據筆記：餐廳職員把污水倒進馬路邊的排水渠是常見的社區衛生問題。'
+            },
+            {
+                id: 'MC_4',
+                type: 'MC',
+                category: '害蟲危害 - 蚊患與鼠患',
+                question: '蚊患和鼠患對人類健康最嚴重的害處是什麼？',
+                options: ['傳播疾病，使人生病甚至死亡', '損毀交通燈', '增加冷氣機滴水', '影響植樹活動'],
+                answer: 0,
+                explanation: '根據筆記：蚊患和鼠患都會傳播疾病，影響公眾健康，使人生病甚至死亡。'
+            },
+            {
+                id: 'MC_5',
+                type: 'MC',
+                category: '害蟲危害 - 老鼠破壞',
+                question: '除了傳播疾病外，老鼠還會對日常生活造成什麼破壞？',
+                options: ['損毀財物和污染食物', '破壞隔音屏障', '導致山泥傾瀉', '使垃圾箱滿溢'],
+                answer: 0,
+                explanation: '根據筆記：老鼠會損毀財物和污染食物。'
+            },
+            {
+                id: 'MC_6',
+                type: 'MC',
+                category: '預防措施 - 戶外防蚊',
+                question: '戶外活動時，居民可以怎樣預防被蚊子叮咬？',
+                options: ['塗上驅蚊劑並避免在叢林逗留', '站在垃圾箱旁邊', '把污水倒進排水渠', '調高電視音量'],
+                answer: 0,
+                explanation: '根據筆記：戶外活動時應塗上驅蚊劑和避免在叢林逗留。'
+            },
+            {
+                id: 'MC_7',
+                type: 'MC',
+                category: '預防措施 - 垃圾處理',
+                question: '丟棄垃圾時，正確的做法是什麼？',
+                options: ['放進垃圾袋並縛好袋口才丟棄', '直接把垃圾散倒在後巷', '把垃圾放在滿了的垃圾箱頂', '丟在街邊紙箱內'],
+                answer: 0,
+                explanation: '根據筆記：不亂拋垃圾，並把垃圾放進垃圾袋，縛好袋口才丟棄。'
+            },
+            {
+                id: 'MC_8',
+                type: 'MC',
+                category: '政府部門 - 食環署職責',
+                question: '食物環境衛生署（食環署）負責以下哪組社區衛生工作？',
+                options: ['收集垃圾、清洗街道、滅蚊、滅鼠', '修築隔音屏障和道路工程', '在斜坡和公園植樹', '執行噪音管制條例'],
+                answer: 0,
+                explanation: '根據筆記：食環署負責收集垃圾、清洗街道、滅蚊及滅鼠。'
+            },
+            {
+                id: 'MC_9',
+                type: 'MC',
+                category: '垃圾處置 - 滿溢垃圾箱',
+                question: '如果街上的垃圾箱已經滿了，我們應該怎樣處理手上的垃圾？',
+                options: ['把垃圾放進其他未滿的垃圾箱', '直接把垃圾堆放在垃圾箱上面', '把垃圾扔進街邊的紙箱裡', '隨手扔在路邊排水渠'],
+                answer: 0,
+                explanation: '根據筆記：垃圾箱滿時應把垃圾放進其他垃圾箱。把垃圾放在垃圾箱上是違法的。'
+            },
+            {
+                id: 'MC_10',
+                type: 'MC',
+                category: '垃圾處置 - 找不到垃圾箱',
+                question: '如果在街上找不到垃圾箱，最正確的處理方法是什麼？',
+                options: ['把垃圾帶走，遇到垃圾箱才扔掉', '把垃圾放在街上的紙箱內', '直接扔在路邊草叢', '扔在冷氣機托盤內'],
+                answer: 0,
+                explanation: '根據筆記：找不到垃圾箱時應把垃圾帶走，遇到垃圾箱才扔掉。放到街上紙箱內是違法的。'
+            },
+            {
+                id: 'MC_11',
+                type: 'MC',
+                category: '環境噪音 - 噪音影響',
+                question: '嘈吵的環境會對居民的生活造成什麼不良影響？',
+                options: ['滋擾生活、妨礙做家課溫習、影響睡眠質素', '引致冷氣機滴水', '招致蚊蟲和老鼠滋生', '導致山泥傾瀉'],
+                answer: 0,
+                explanation: '根據筆記：噪音會滋擾生活、妨礙學生做家課溫習，並影響睡眠質素。'
+            },
+            {
+                id: 'MC_12',
+                type: 'MC',
+                category: '環境噪音 - 政府減噪措施',
+                question: '政府在接近民居的道路上增設什麼設施來減少噪音？',
+                options: ['隔音屏障', '垃圾袋', '排水渠蓋', '驅蚊劑'],
+                answer: 0,
+                explanation: '根據筆記：政府在接近民居的道路上增設隔音屏障。'
+            },
+            {
+                id: 'MC_13',
+                type: 'MC',
+                category: '環境噪音 - 噪音管制條例',
+                question: '政府執行哪一項法例來管制建築維修工程時間及減少交通工具噪音？',
+                options: ['《噪音管制條例》', '《環境綠化條例》', '《食物衛生條例》', '《斜坡安全條例》'],
+                answer: 0,
+                explanation: '根據筆記：政府執行《噪音管制條例》來管制工程時間及交通噪音。'
+            },
+            {
+                id: 'MC_14',
+                type: 'MC',
+                category: '綠化社區 - 植物好處',
+                question: '在社區栽種植物（綠化環境）有哪些好處？',
+                options: ['美化環境、阻隔灰塵令空氣清新、提供遮蔭休憩、防止山泥傾瀉', '滅蚊滅鼠及清洗街道', '管制施工工程時間', '防止垃圾箱滿溢'],
+                answer: 0,
+                explanation: '根據筆記：栽種植物好處包括美化環境、阻隔灰塵令空氣清新、提供遮蔭休憩、防止山泥傾瀉。'
+            },
+            {
+                id: 'MC_15',
+                type: 'MC',
+                category: '綠化社區 - 綠化部門分工',
+                question: '土木工程拓展署主要在什麼地方種植植物來進行綠化？',
+                options: ['斜坡', '公園內', '垃圾箱旁', '後巷水渠'],
+                answer: 0,
+                explanation: '根據筆記：土木工程拓展署在斜坡種植植物；康樂及文化事務署在公園種植植物。'
+            },
+
+            // ----------------- TRUE / FALSE QUESTIONS -----------------
+            {
+                id: 'TF_1',
+                type: 'TF',
+                category: '是非題 - 垃圾處置法例',
+                question: '如果街上的垃圾箱滿了，把垃圾放在垃圾箱上面是違法的。',
+                options: ['正確', '錯誤'],
+                answer: 0,
+                explanation: '正確！筆記明確指出：把垃圾放在垃圾箱上是違法的。'
+            },
+            {
+                id: 'TF_2',
+                type: 'TF',
+                category: '是非題 - 街上紙箱棄置規定',
+                question: '如果在街上找不到垃圾箱，把手上的垃圾放到街上的紙箱內是完全合法的做法。',
+                options: ['正確', '錯誤'],
+                answer: 1,
+                explanation: '錯誤！筆記明確指出：把垃圾放到街上的紙箱內是違法的，應把垃圾帶走遇到垃圾箱才扔掉。'
+            },
+            {
+                id: 'TF_3',
+                type: 'TF',
+                category: '是非題 - 餐廳污水倒排水渠',
+                question: '餐廳職員把污水直接倒進馬路邊的排水渠，是正確清潔環境的做法。',
+                options: ['正確', '錯誤'],
+                answer: 1,
+                explanation: '錯誤！這是常見的社區衛生問題，會污染環境。'
+            },
+            {
+                id: 'TF_4',
+                type: 'TF',
+                category: '是非題 - 老鼠害處',
+                question: '老鼠只會污染食物，不會損毀財物，也不會傳播疾病。',
+                options: ['正確', '錯誤'],
+                answer: 1,
+                explanation: '錯誤！老鼠會傳播疾病使人生病甚至死亡，並且會損毀財物和污染食物。'
+            },
+            {
+                id: 'TF_5',
+                type: 'TF',
+                category: '是非題 - 預防蚊患積水',
+                question: '徹底清除積水是避免蚊子滋生的有效方法。',
+                options: ['正確', '錯誤'],
+                answer: 0,
+                explanation: '正確！有積水的地方易生蚊子，徹底清除積水可避免蚊子滋生。'
+            },
+            {
+                id: 'TF_6',
+                type: 'TF',
+                category: '是非題 - 食環署職責',
+                question: '食物環境衛生署的工作包括收集垃圾、清洗街道、滅蚊和滅鼠。',
+                options: ['正確', '錯誤'],
+                answer: 0,
+                explanation: '正確！這四項都是食物環境衛生署（食環署）的職責。'
+            },
+            {
+                id: 'TF_7',
+                type: 'TF',
+                category: '是非題 - 噪音影響學習',
+                question: '嘈吵的環境會妨礙學生做家課和溫習，還會影響睡眠質素。',
+                options: ['正確', '錯誤'],
+                answer: 0,
+                explanation: '正確！筆記指出噪音會滋擾生活、妨礙學生做家課溫習及影響睡眠質素。'
+            },
+            {
+                id: 'TF_8',
+                type: 'TF',
+                category: '是非題 - 居民減少噪音',
+                question: '居民可以把電視或音響的音量調低，來減少對鄰居產生的噪音。',
+                options: ['正確', '錯誤'],
+                answer: 0,
+                explanation: '正確！居民應避免產生噪音，例如調低電視或音響音量。'
+            },
+            {
+                id: 'TF_9',
+                type: 'TF',
+                category: '是非題 - 植物防止山泥傾瀉',
+                question: '在斜坡上栽種植物可以幫助防止山泥傾瀉。',
+                options: ['正確', '錯誤'],
+                answer: 0,
+                explanation: '正確！栽種植物的好處之一包括防止山泥傾瀉。'
+            },
+            {
+                id: 'TF_10',
+                type: 'TF',
+                category: '是非題 - 綠化部門分工',
+                question: '康樂及文化事務署負責在斜坡上種植植物，土木工程拓展署負責在公園種植植物。',
+                options: ['正確', '錯誤'],
+                answer: 1,
+                explanation: '錯誤！康樂及文化事務署在「公園」種植；土木工程拓展署在「斜坡」種植。兩者顛倒了！'
+            },
+
+            // ----------------- FILL IN THE BLANK QUESTIONS -----------------
+            {
+                id: 'FITB_1',
+                type: 'FITB',
+                category: '選詞填空 - 蚊蟲與積水',
+                question: '冷氣機托盤積水容易滋生【填空1】，而胡亂棄置垃圾容易吸引【填空2】出沒。',
+                blanksCount: 2,
+                wordBank: ['蚊子', '老鼠', '灰塵', '綠化'],
+                answer: ['蚊子', '老鼠'],
+                explanation: '積水易生蚊子，胡亂棄置垃圾容易有老鼠出沒。'
+            },
+            {
+                id: 'FITB_2',
+                type: 'FITB',
+                category: '選詞填空 - 防蚊戶外措施',
+                question: '戶外活動時，居民應塗上【填空1】，並避免在【填空2】逗留以防蚊叮。',
+                blanksCount: 2,
+                wordBank: ['驅蚊劑', '叢林', '公園', '排水渠'],
+                answer: ['驅蚊劑', '叢林'],
+                explanation: '戶外活動應塗上驅蚊劑並避免在叢林逗留。'
+            },
+            {
+                id: 'FITB_3',
+                type: 'FITB',
+                category: '選詞填空 - 垃圾袋處理',
+                question: '我們應該把垃圾放進垃圾袋，【填空1】袋口才丟棄；若街上垃圾箱滿了，放在垃圾箱上是【填空2】的。',
+                blanksCount: 2,
+                wordBank: ['縛好', '違法', '打開', '合法'],
+                answer: ['縛好', '違法'],
+                explanation: '垃圾要縛好袋口才丟棄；把垃圾放在滿了的垃圾箱上屬於違法。'
+            },
+            {
+                id: 'FITB_4',
+                type: 'FITB',
+                category: '選詞填空 - 減噪設施與法例',
+                question: '政府在接近民居道路增設【填空1】屏障，並執行《【填空2】管制條例》管制工程時間。',
+                blanksCount: 2,
+                wordBank: ['隔音', '噪音', '遮蔭', '清潔'],
+                answer: ['隔音', '噪音'],
+                explanation: '政府增設隔音屏障，並執行《噪音管制條例》。'
+            },
+            {
+                id: 'FITB_5',
+                type: 'FITB',
+                category: '選詞填空 - 綠化好處',
+                question: '栽種植物可以阻隔【填空1】，令空氣清新，還能提供遮蔭【填空2】的地方。',
+                blanksCount: 2,
+                wordBank: ['灰塵', '休憩', '積水', '施工'],
+                answer: ['灰塵', '休憩'],
+                explanation: '植物能阻隔灰塵使空氣清新，並提供遮蔭休憩地方。'
+            },
+            {
+                id: 'FITB_6',
+                type: 'FITB',
+                category: '選詞填空 - 政府綠化部門',
+                question: '【填空1】事務署在公園種植植物，土木工程拓展署則在【填空2】種植植物。',
+                blanksCount: 2,
+                wordBank: ['康樂及文化', '斜坡', '食物環境衛生', '後巷'],
+                answer: ['康樂及文化', '斜坡'],
+                explanation: '康樂及文化事務署在公園種植，土木工程拓展署在斜坡種植。'
+            },
+            {
+                id: 'FITB_7',
+                type: 'FITB',
+                category: '選詞填空 - 社區綠化活動',
+                question: '市民可以積極參與【填空1】活動，共同建立和保持綠化社區。',
+                blanksCount: 1,
+                wordBank: ['植樹', '滅鼠', '清洗街道', '施工'],
+                answer: ['植樹'],
+                explanation: '市民可透過參與植樹活動來建立和保持綠化社區。'
+            }
+        ];
+
+        /* ====================================================
+           2. STATE MANAGEMENT & AUDIO SYNTHESIS
+        ==================================================== */
+        let currentMode = 'MIXED'; // 'MC', 'FITB', 'TF', 'MIXED'
+        let activeQuestions = [];
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let streak = 0;
+        let maxStreak = 0;
+        let correctAnswersCount = 0;
+        let userResponses = [];
+
+        // FITB temporary state
+        let fitbUserAnswers = [];
+        let fitbActiveBlankIndex = 0;
+
+        // Audio & Speech state
+        let soundEnabled = true;
+        let autoTTSEnabled = true;
+        let audioCtx = null;
+        let synth = window.speechSynthesis;
+        let chineseVoice = null;
+
+        // Load High Score
+        let highScore = parseInt(localStorage.getItem('community_quiz_v4_highscore') || '0');
+
+        // Initialize Cantonese / Chinese Voice for Text-To-Speech
+        function initVoices() {
+            if (!synth) return;
+            const voices = synth.getVoices();
+            // Prioritize Cantonese (zh-HK), then Mandarin (zh-TW, zh-CN)
+            chineseVoice = voices.find(v => v.lang.includes('zh-HK')) || 
+                           voices.find(v => v.lang.includes('zh-TW')) || 
+                           voices.find(v => v.lang.includes('zh-CN')) || 
+                           voices.find(v => v.lang.includes('zh'));
+        }
+
+        if (speechSynthesis.onvoiceschanged !== undefined) {
+            speechSynthesis.onvoiceschanged = initVoices;
+        }
+
+        function speakText(text) {
+            if (!synth) return;
+            synth.cancel(); // Stop any ongoing speech
+
+            // Clean prompt placeholders if present
+            const cleanText = text.replace(/【填空\d+】/g, '空白').replace(/_/g, '');
+            const utterance = new SpeechSynthesisUtterance(cleanText);
+            
+            if (!chineseVoice) initVoices();
+            if (chineseVoice) utterance.voice = chineseVoice;
+            
+            utterance.rate = 0.9; // Slightly slower for primary kids
+            utterance.pitch = 1.0;
+            
+            synth.speak(utterance);
+        }
+
+        function speakCurrentQuestion() {
+            const q = activeQuestions[currentQuestionIndex];
+            if (!q) return;
+            let textToRead = q.question;
+            if (q.type === 'FITB') {
+                textToRead += "。可選擇的詞語有：" + q.wordBank.join('、');
+            }
+            speakText(textToRead);
+        }
+
+        function toggleAutoTTS() {
+            autoTTSEnabled = !autoTTSEnabled;
+            const status = document.getElementById('auto-tts-status');
+            const icon = document.getElementById('auto-tts-icon');
+            if (autoTTSEnabled) {
+                status.textContent = '開啟';
+                status.className = 'font-bold text-cyber-neon';
+                icon.className = 'fa-solid fa-robot text-cyber-accent';
+                playSound('click');
+            } else {
+                status.textContent = '關閉';
+                status.className = 'font-bold text-slate-500';
+                icon.className = 'fa-solid fa-robot text-slate-500';
+                if (synth) synth.cancel();
+            }
+        }
+
+        /* Sound FX via Web Audio API */
+        function initAudio() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+
+        function playSound(type) {
+            if (!soundEnabled) return;
+            try {
+                initAudio();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                const now = audioCtx.currentTime;
+
+                if (type === 'click') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(600, now);
+                    gain.gain.setValueAtTime(0.08, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+                    osc.start(now);
+                    osc.stop(now + 0.05);
+                } else if (type === 'correct') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(523.25, now);
+                    osc.frequency.setValueAtTime(659.25, now + 0.08);
+                    osc.frequency.setValueAtTime(783.99, now + 0.16);
+                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                    osc.start(now);
+                    osc.stop(now + 0.3);
+                } else if (type === 'wrong') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(220, now);
+                    osc.frequency.setValueAtTime(160, now + 0.1);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+                    osc.start(now);
+                    osc.stop(now + 0.25);
+                } else if (type === 'win') {
+                    osc.type = 'square';
+                    osc.frequency.setValueAtTime(440, now);
+                    osc.frequency.setValueAtTime(554.37, now + 0.1);
+                    osc.frequency.setValueAtTime(659.25, now + 0.2);
+                    osc.frequency.setValueAtTime(880, now + 0.3);
+                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+                    osc.start(now);
+                    osc.stop(now + 0.5);
+                }
+            } catch (e) {}
+        }
+
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            const icon = document.getElementById('sound-icon');
+            if (soundEnabled) {
+                icon.className = 'fa-solid fa-volume-high';
+                playSound('click');
+            } else {
+                icon.className = 'fa-solid fa-volume-xmark text-red-400';
+            }
+        }
+
+        /* Utility Array Shuffler */
+        function shuffleArray(arr) {
+            const array = [...arr];
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        /* ====================================================
+           3. GAME INIT & NAVIGATION
+        ==================================================== */
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('high-score').textContent = highScore;
+            initVoices();
+        });
+
+        function goHome() {
+            playSound('click');
+            if (synth) synth.cancel();
+            document.getElementById('start-screen').classList.remove('hidden');
+            document.getElementById('quiz-screen').classList.add('hidden');
+            document.getElementById('result-screen').classList.add('hidden');
+        }
+
+        function selectGameMode(mode) {
+            playSound('click');
+            currentMode = mode;
+
+            // Filter master database based on selected mode
+            let pool = [];
+            if (mode === 'MC') {
+                pool = MASTER_QUESTION_BANK.filter(q => q.type === 'MC');
+            } else if (mode === 'FITB') {
+                pool = MASTER_QUESTION_BANK.filter(q => q.type === 'FITB');
+            } else if (mode === 'TF') {
+                pool = MASTER_QUESTION_BANK.filter(q => q.type === 'TF');
+            } else {
+                pool = [...MASTER_QUESTION_BANK]; // Mixed
+            }
+
+            // Shuffle pool and take up to 10 non-repeating questions
+            activeQuestions = shuffleArray(pool).slice(0, 10);
+
+            // Reset Game Stats
+            currentQuestionIndex = 0;
+            score = 0;
+            streak = 0;
+            maxStreak = 0;
+            correctAnswersCount = 0;
+            userResponses = [];
+
+            // UI Mode Badge Text
+            const modeBadge = document.getElementById('mode-badge');
+            if (mode === 'MC') modeBadge.textContent = '多項選擇題';
+            else if (mode === 'FITB') modeBadge.textContent = '選詞填空題';
+            else if (mode === 'TF') modeBadge.textContent = '是非判斷題';
+            else modeBadge.textContent = '綜合挑戰模式';
+
+            document.getElementById('total-questions').textContent = activeQuestions.length;
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('result-screen').classList.add('hidden');
+            document.getElementById('quiz-screen').classList.remove('hidden');
+            document.getElementById('quiz-screen').classList.add('flex');
+
+            updateStatsDisplay();
+            renderCurrentQuestion();
+        }
+
+        function updateStatsDisplay() {
+            document.getElementById('score-text').textContent = score + ' PTS';
+            document.getElementById('current-index').textContent = currentQuestionIndex + 1;
+            const pct = ((currentQuestionIndex) / activeQuestions.length) * 100;
+            document.getElementById('progress-bar').style.width = pct + '%';
+        }
+
+        /* ====================================================
+           4. RENDER QUESTION WITH INDIVIDUAL SPEAKER BUTTONS
+        ==================================================== */
+        function renderCurrentQuestion() {
+            const q = activeQuestions[currentQuestionIndex];
+            
+            // Reset UI States
+            document.getElementById('feedback-box').classList.add('hidden');
+            document.getElementById('submit-btn').classList.remove('hidden');
+            document.getElementById('next-btn').classList.add('hidden');
+            document.getElementById('word-bank-container').classList.add('hidden');
+
+            document.getElementById('question-category').innerHTML = `<i class="fa-solid fa-circle-dot text-[10px]"></i> ${q.category}`;
+
+            const container = document.getElementById('answer-container');
+            container.innerHTML = '';
+
+            if (q.type === 'MC' || q.type === 'TF') {
+                document.getElementById('question-text').textContent = q.question;
+
+                // Render option buttons with individual speaker button
+                q.options.forEach((opt, idx) => {
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'flex items-center gap-2';
+
+                    const optBtn = document.createElement('button');
+                    optBtn.className = 'option-btn flex-grow text-left p-4 rounded-xl bg-slate-900/90 border border-slate-700 hover:border-cyber-accent hover:bg-slate-800 text-base md:text-lg font-bold text-slate-200 transition flex items-center justify-between group';
+                    optBtn.onclick = () => selectMCAnswer(idx);
+                    optBtn.innerHTML = `
+                        <span>${opt}</span>
+                        <div class="opt-indicator w-6 h-6 rounded-full border border-slate-600 group-hover:border-cyber-accent flex items-center justify-center text-xs text-transparent">
+                            <i class="fa-solid fa-check"></i>
+                        </div>
+                    `;
+
+                    // Individual option speech button
+                    const speakOptBtn = document.createElement('button');
+                    speakOptBtn.className = 'speak-btn p-3 rounded-xl bg-slate-900 border border-slate-700 text-slate-400 hover:text-cyber-accent';
+                    speakOptBtn.title = '聽朗讀選項';
+                    speakOptBtn.onclick = (e) => {
+                        e.stopPropagation();
+                        speakText(opt);
+                    };
+                    speakOptBtn.innerHTML = '<i class="fa-solid fa-volume-high"></i>';
+
+                    wrapper.appendChild(optBtn);
+                    wrapper.appendChild(speakOptBtn);
+                    container.appendChild(wrapper);
+                });
+
+            } else if (q.type === 'FITB') {
+                fitbUserAnswers = new Array(q.blanksCount).fill('');
+                fitbActiveBlankIndex = 0;
+
+                // Question formatting with blanks
+                let formattedQuestion = q.question;
+                for (let i = 0; i < q.blanksCount; i++) {
+                    const placeholder = `【填空${i+1}】`;
+                    const blankHtml = `<span id="fitb-blank-${i}" onclick="setActiveBlank(${i})" class="fitb-blank inline-block px-4 py-1.5 mx-1 min-w-[110px] text-center font-bold text-cyber-accent border-b-4 border-cyber-accent bg-cyan-950/60 rounded-lg cursor-pointer transition hover:bg-cyan-900/80 text-xl">[ 點擊選擇 ]</span>`;
+                    formattedQuestion = formattedQuestion.replace(placeholder, blankHtml);
+                }
+                document.getElementById('question-text').innerHTML = formattedQuestion;
+
+                // Render BIG Word Bank Choices
+                document.getElementById('word-bank-container').classList.remove('hidden');
+                const wordBankArea = document.getElementById('word-bank-words');
+                wordBankArea.innerHTML = '';
+
+                q.wordBank.forEach((word) => {
+                    const chipWrapper = document.createElement('div');
+                    chipWrapper.className = 'flex items-center gap-1.5';
+
+                    // ACCESSIBLE & BIG CHOICE BUTTON
+                    const wordBtn = document.createElement('button');
+                    wordBtn.className = 'big-choice-btn font-black bg-slate-900 border-2 border-slate-700 hover:border-cyber-accent hover:text-cyber-accent text-slate-100 rounded-xl transition active:scale-95 shadow-md flex items-center justify-center';
+                    wordBtn.textContent = word;
+                    wordBtn.onclick = () => fillWordIntoBlank(word);
+
+                    // Individual Speaker button for word chip
+                    const speakWordBtn = document.createElement('button');
+                    speakWordBtn.className = 'speak-btn p-2.5 rounded-xl bg-slate-900 border border-slate-700 text-slate-400 hover:text-cyber-accent';
+                    speakWordBtn.onclick = (e) => {
+                        e.stopPropagation();
+                        speakText(word);
+                    };
+                    speakWordBtn.innerHTML = '<i class="fa-solid fa-volume-high text-sm"></i>';
+
+                    chipWrapper.appendChild(wordBtn);
+                    chipWrapper.appendChild(speakWordBtn);
+                    wordBankArea.appendChild(chipWrapper);
+                });
+
+                setTimeout(() => setActiveBlank(0), 50);
+            }
+
+            updateStatsDisplay();
+
+            // Auto-Read Question on display if TTS enabled
+            if (autoTTSEnabled) {
+                setTimeout(() => speakCurrentQuestion(), 300);
+            }
+        }
+
+        /* Option Selection */
+        let selectedOptionIdx = null;
+
+        function selectMCAnswer(idx) {
+            playSound('click');
+            selectedOptionIdx = idx;
+
+            const btns = document.querySelectorAll('.option-btn');
+            btns.forEach((btn, i) => {
+                const indicator = btn.querySelector('.opt-indicator');
+                if (i === idx) {
+                    btn.className = 'option-btn flex-grow text-left p-4 rounded-xl bg-cyan-950 border-2 border-cyber-accent text-white font-bold text-base md:text-lg transition flex items-center justify-between shadow-[0_0_15px_rgba(0,240,255,0.3)]';
+                    indicator.className = 'opt-indicator w-6 h-6 rounded-full bg-cyber-accent text-slate-950 font-bold flex items-center justify-center text-xs';
+                } else {
+                    btn.className = 'option-btn flex-grow text-left p-4 rounded-xl bg-slate-900/90 border border-slate-700 hover:border-cyber-accent hover:bg-slate-800 text-base md:text-lg font-bold text-slate-200 transition flex items-center justify-between group';
+                    indicator.className = 'opt-indicator w-6 h-6 rounded-full border border-slate-600 group-hover:border-cyber-accent flex items-center justify-center text-xs text-transparent';
+                }
+            });
+        }
+
+        /* FITB Choice Logic */
+        function setActiveBlank(index) {
+            playSound('click');
+            fitbActiveBlankIndex = index;
+            const blanks = document.querySelectorAll('.fitb-blank');
+            blanks.forEach((b, idx) => {
+                if (idx === index) {
+                    b.classList.add('border-cyber-neon', 'bg-emerald-950/80', 'ring-2', 'ring-cyber-neon');
+                } else {
+                    b.classList.remove('border-cyber-neon', 'bg-emerald-950/80', 'ring-2', 'ring-cyber-neon');
+                }
+            });
+        }
+
+        function fillWordIntoBlank(word) {
+            playSound('click');
+            fitbUserAnswers[fitbActiveBlankIndex] = word;
+            const targetBlank = document.getElementById(`fitb-blank-${fitbActiveBlankIndex}`);
+            if (targetBlank) {
+                targetBlank.textContent = word;
+            }
+
+            // Move to next empty blank
+            const q = activeQuestions[currentQuestionIndex];
+            for (let i = 0; i < q.blanksCount; i++) {
+                if (!fitbUserAnswers[i]) {
+                    setActiveBlank(i);
+                    break;
+                }
+            }
+        }
+
+        /* ====================================================
+           5. ANSWER CHECKING & FEEDBACK
+        ==================================================== */
+        function checkAnswer() {
+            const q = activeQuestions[currentQuestionIndex];
+            let isCorrect = false;
+            let userAnsFormatted = '';
+            let correctAnsFormatted = '';
+
+            if (q.type === 'MC' || q.type === 'TF') {
+                if (selectedOptionIdx === null) {
+                    alert('請先選擇一個答案！');
+                    return;
+                }
+                isCorrect = (selectedOptionIdx === q.answer);
+                userAnsFormatted = q.options[selectedOptionIdx];
+                correctAnsFormatted = q.options[q.answer];
+
+            } else if (q.type === 'FITB') {
+                if (fitbUserAnswers.some(a => a === '')) {
+                    alert('請填滿所有空格！');
+                    return;
+                }
+                isCorrect = fitbUserAnswers.every((ans, idx) => ans === q.answer[idx]);
+                userAnsFormatted = fitbUserAnswers.join(' / ');
+                correctAnsFormatted = q.answer.join(' / ');
+            }
+
+            // Record response
+            userResponses.push({
+                question: q.question,
+                category: q.category,
+                isCorrect: isCorrect,
+                userAnswer: userAnsFormatted,
+                correctAnswer: correctAnsFormatted,
+                explanation: q.explanation
+            });
+
+            // Feedback Display
+            const feedbackBox = document.getElementById('feedback-box');
+            const feedbackIcon = document.getElementById('feedback-icon');
+            const feedbackTitle = document.getElementById('feedback-title');
+            const feedbackDetail = document.getElementById('feedback-detail');
+
+            feedbackBox.classList.remove('hidden');
+
+            if (isCorrect) {
+                playSound('correct');
+                streak++;
+                if (streak > maxStreak) maxStreak = streak;
+                correctAnswersCount++;
+                score += 10 + (streak > 1 ? (streak - 1) * 2 : 0);
+
+                feedbackBox.className = 'mt-6 p-4 rounded-xl bg-emerald-950/80 border border-cyber-neon text-emerald-200';
+                feedbackIcon.innerHTML = '<i class="fa-solid fa-circle-check text-cyber-neon"></i>';
+                feedbackTitle.className = 'font-bold text-base mb-1 text-cyber-neon';
+                feedbackTitle.textContent = `答對了！ ${streak > 1 ? `(連勝 x${streak})` : ''}`;
+
+            } else {
+                playSound('wrong');
+                streak = 0;
+
+                feedbackBox.className = 'mt-6 p-4 rounded-xl bg-red-950/80 border border-red-500 text-red-200';
+                feedbackIcon.innerHTML = '<i class="fa-solid fa-circle-xmark text-red-400"></i>';
+                feedbackTitle.className = 'font-bold text-base mb-1 text-red-400';
+                feedbackTitle.textContent = '答錯了！';
+            }
+
+            feedbackDetail.innerHTML = `<strong>正確答案：</strong>${correctAnsFormatted}<br><strong>筆記重點：</strong>${q.explanation}`;
+
+            // Lock controls
+            document.getElementById('submit-btn').classList.add('hidden');
+            document.getElementById('next-btn').classList.remove('hidden');
+
+            const optionBtns = document.querySelectorAll('.option-btn');
+            optionBtns.forEach(btn => btn.onclick = null);
+
+            selectedOptionIdx = null;
+            updateStatsDisplay();
+        }
+
+        function nextQuestion() {
+            playSound('click');
+            if (synth) synth.cancel();
+            currentQuestionIndex++;
+
+            if (currentQuestionIndex < activeQuestions.length) {
+                renderCurrentQuestion();
+            } else {
+                showResultsScreen();
+            }
+        }
+
+        /* ====================================================
+           6. END OF GAME - SHOW ONLY WRONG QUESTIONS
+        ==================================================== */
+        function showResultsScreen() {
+            playSound('win');
+            if (synth) synth.cancel();
+
+            if (score > highScore) {
+                highScore = score;
+                localStorage.setItem('community_quiz_v4_highscore', highScore);
+                document.getElementById('high-score').textContent = highScore;
+            }
+
+            document.getElementById('progress-bar').style.width = '100%';
+            document.getElementById('quiz-screen').classList.add('hidden');
+            document.getElementById('result-screen').classList.remove('hidden');
+
+            const total = activeQuestions.length;
+            const accuracy = Math.round((correctAnswersCount / total) * 100);
+
+            document.getElementById('final-score').textContent = score;
+            document.getElementById('final-accuracy').textContent = accuracy + '%';
+            document.getElementById('final-streak').textContent = maxStreak;
+            document.getElementById('final-correct').textContent = `${correctAnswersCount}/${total}`;
+
+            // Filter ONLY wrong questions
+            const wrongResponses = userResponses.filter(r => !r.isCorrect);
+
+            const perfectBadge = document.getElementById('perfect-badge-container');
+            const mistakeBadge = document.getElementById('mistake-badge-container');
+            const wrongSection = document.getElementById('wrong-questions-section');
+            const wrongList = document.getElementById('wrong-questions-list');
+
+            wrongList.innerHTML = '';
+
+            if (wrongResponses.length === 0) {
+                // 100% PERFECT SCORE!
+                perfectBadge.classList.remove('hidden');
+                mistakeBadge.classList.add('hidden');
+                wrongSection.classList.add('hidden');
+            } else {
+                // HAS MISTAKES -> SHOW ONLY WRONG QUESTIONS
+                perfectBadge.classList.add('hidden');
+                mistakeBadge.classList.remove('hidden');
+                wrongSection.classList.remove('hidden');
+
+                wrongResponses.forEach((item, idx) => {
+                    const card = document.createElement('div');
+                    card.className = 'p-4 rounded-xl bg-red-950/40 border border-red-800/60 text-sm space-y-2';
+                    
+                    card.innerHTML = `
+                        <div class="flex items-center justify-between font-bold text-red-400">
+                            <span><i class="fa-solid fa-circle-xmark"></i> 錯題 ${idx + 1}：[${item.category}]</span>
+                            <button onclick="speakText('${item.question.replace(/'/g, "\\'")}。正確答案是：${item.correctAnswer.replace(/'/g, "\\'")}')" class="speak-btn text-cyber-accent text-base">
+                                <i class="fa-solid fa-volume-high"></i> 聽解答
+                            </button>
+                        </div>
+                        <p class="text-white font-bold text-base leading-relaxed">${item.question}</p>
+                        <div class="text-xs space-y-1">
+                            <p class="text-red-300">你的回答：${item.userAnswer}</p>
+                            <p class="text-cyber-neon font-bold">正確答案：${item.correctAnswer}</p>
+                        </div>
+                        <p class="text-slate-300 text-xs italic bg-slate-900/60 p-2 rounded border border-slate-800">溫習重點：${item.explanation}</p>
+                    `;
+                    wrongList.appendChild(card);
+                });
+            }
+        }
+
+        function restartQuiz() {
+            playSound('click');
+            selectGameMode(currentMode);
+        }
+    </script>
+</body>
+</html>
